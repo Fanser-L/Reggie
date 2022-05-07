@@ -117,7 +117,7 @@
           return {
              input: '',
              counts: 0,
-             page: 1,
+             currentPage: 1,
              pageSize: 10,
              tableData : [],
              id : '',
@@ -134,7 +134,7 @@
         methods: {
           async init () {
             const params = {
-              page: this.page,
+              currentPage: this.currentPage,
               pageSize: this.pageSize,
               name: this.input ? this.input : undefined
             }
@@ -148,7 +148,7 @@
             })
           },
           handleQuery() {
-            this.page = 1;
+            this.currentPage = 1;
             this.init();
           },
            // 添加

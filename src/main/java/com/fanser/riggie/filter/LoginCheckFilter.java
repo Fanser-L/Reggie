@@ -2,10 +2,7 @@ package com.fanser.riggie.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.fanser.riggie.common.R;
-import com.fanser.riggie.entity.Employee;
-import com.fanser.riggie.util.Constants;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpRequest;
 import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.*;
@@ -67,8 +64,6 @@ public class LoginCheckFilter implements Filter {
         response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
         log.info("用户已经登陆");
         return;
-
-
     }
     /*
     * 路径匹配检测是否需要放行
