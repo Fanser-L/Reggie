@@ -1,2 +1,10 @@
+com\fanser\riggie\service\impl\EmployeeServiceImpl.class
+com\fanser\riggie\filter\LoginCheckFilter.class
+com\fanser\riggie\util\Constants.class
 com\fanser\riggie\ReggieApplication.class
+com\fanser\riggie\service\EmployeeService.class
+com\fanser\riggie\controller\EmployeeController.class
+com\fanser\riggie\mapper\EmployeeMapper.class
+com\fanser\riggie\common\R.class
+com\fanser\riggie\entity\Employee.class
 com\fanser\riggie\config\WebMvcConfig.class
