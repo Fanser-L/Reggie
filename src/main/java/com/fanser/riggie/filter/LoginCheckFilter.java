@@ -1,6 +1,7 @@
 package com.fanser.riggie.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.fanser.riggie.common.BaseContext;
 import com.fanser.riggie.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
@@ -57,6 +58,10 @@ public class LoginCheckFilter implements Filter {
         //4.获取session对象，判断是否已经登陆
         if (request.getSession().getAttribute("employee")!=null){
             log.info("用户已经登陆");
+
+            Long empId = (Long) request.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(empId);
+
             filterChain.doFilter(request,response);
             return;
         }
