@@ -3,6 +3,8 @@ package com.fanser.riggie.filter;
 import com.alibaba.fastjson.JSON;
 import com.fanser.riggie.common.BaseContext;
 import com.fanser.riggie.common.R;
+import com.fanser.riggie.entity.Employee;
+import com.fanser.riggie.util.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
 
@@ -11,12 +13,14 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 /*
 * 过滤所有请求
 * */
 @WebFilter(filterName = "LoginCheckFilter",urlPatterns = "/*")
+//@WebFilter(filterName = "LoginCheckFilter",urlPatterns = "/backend")
 @Slf4j
 public class LoginCheckFilter implements Filter {
 
@@ -27,9 +31,25 @@ public class LoginCheckFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
+//        //拦截请求
+//        log.info("拦截到的请求：{}",request.getRequestURI());
+//        //定义不需要处理的请求路径
+//        ArrayList<String> urls = new ArrayList<String>();
+//        urls.add("/employee/login");
+//        urls.add("/employee/logout");
+//        urls.add("/backend/**");
+//        urls.add("/front/**");
+//        urls.add("/backend/page/login/login.html");
+//
 //        //过滤器，从session中获取用户
-//        Employee employee = (Employee) request.getSession().getAttribute(Constants.USER_SESSION);
-//        if (employee==null){
+//        Employee employee = (Employee) request.getSession().getAttribute("employee");
+//        log.info("userInfo:{}",employee);
+//
+//        String requestURL = request.getRequestURI();
+//        if (urls.contains(requestURL)){
+//            filterChain.doFilter(request,response);
+//        }
+//        if (employee==null && !urls.contains(requestURL)){
 //            response.sendRedirect(request.getContextPath()+"/backend/page/login/login.html");
 //        }else{
 //            log.info("拦截请求：{}",request.getRequestURI());

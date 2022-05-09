@@ -65,8 +65,18 @@ public class CategoryController {
     public R<String> delete(HttpServletRequest request,Long id){
         log.info("菜品名称：{},菜品ID：{}",request.getSession().getAttribute("category"),id);
 
-        categoryService.removeById(id);
+//        categoryService.removeById(id);
+        categoryService.remove(id);
         return R.success("删除成功");
+
+    }
+    @PutMapping
+    public R<String> update(@RequestBody Category category){
+        log.info("修改分类信息{}",category);
+
+        categoryService.updateById(category);
+        return R.success("修改分类菜品成功");
+
     }
 
 }
