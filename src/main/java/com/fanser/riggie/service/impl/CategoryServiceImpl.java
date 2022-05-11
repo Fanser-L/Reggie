@@ -32,7 +32,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
         //添加查询条件，根据分类id进行查询
         dishLambdaQueryWrapper.eq(Dish::getCategoryId,id);
-        int count = dishService.count(dishLambdaQueryWrapper);
+        int count = (int) dishService.count(dishLambdaQueryWrapper);
 
         //查询当前分类是否关联了菜品，如果已经关联了菜品，抛出一个业务异常
         if (count>0){
@@ -43,7 +43,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         LambdaQueryWrapper<Setmeal> setmealLambdaQueryWrapper = new LambdaQueryWrapper<>();
         //添加查询条件，根据分类id进行查询
         setmealLambdaQueryWrapper.eq(Setmeal::getCategoryId,id);
-        int count1 = setmealService.count(setmealLambdaQueryWrapper);
+        int count1 = (int) setmealService.count(setmealLambdaQueryWrapper);
 
         if (count1>0){
             //说明已经关联了菜品，抛出一个业务异常
