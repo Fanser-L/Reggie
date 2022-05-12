@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.fanser.reggie.common.BaseContext;
 import com.fanser.reggie.common.R;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.*;
@@ -17,6 +18,7 @@ import java.io.IOException;
 * 过滤所有请求
 * */
 @WebFilter(filterName = "LoginCheckFilter",urlPatterns = "/*")
+@Component//不加这个注解会出现莫名其妙的错误
 //@WebFilter(filterName = "LoginCheckFilter",urlPatterns = "/backend")
 @Slf4j
 public class LoginCheckFilter implements Filter {
@@ -75,17 +77,18 @@ public class LoginCheckFilter implements Filter {
         }
         //4.获取session对象，判断是否已经登陆
         if (request.getSession().getAttribute("employee")!=null){
-            log.info("用户已经登陆");
-
             Long empId = (Long) request.getSession().getAttribute("employee");
+
+            log.info("用户已经登陆,id为：{}",empId);
             BaseContext.setCurrentId(empId);
 
             filterChain.doFilter(request,response);
             return;
         }
         //5.如果未登陆，直接返回登陆页面，通过输出流的方式向客户端响应数据
+        log.info("用户未登陆");
         response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
-        log.info("用户已经登陆");
+
         return;
     }
     /*

@@ -1,6 +1,7 @@
 package com.fanser.reggie.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -47,10 +48,5 @@ public class Category implements Serializable {
     //修改人
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateUser;
-
-
-//    //是否删除
-//    @TableLogic
-//    private Integer isDeleted;
 
 }

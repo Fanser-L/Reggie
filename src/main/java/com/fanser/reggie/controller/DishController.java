@@ -15,7 +15,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,15 +32,10 @@ public class DishController {
     @Autowired//波浪线 因为没有构造器导致
     private DishFlavorService dishFlavorService;
     @PostMapping
-    public R<String> save(HttpServletRequest request ,@RequestBody DishDto dishDto){//提交的json数据需要requestBody注解
-        log.info("数据传输对象：{}",dishDto);
-//
-//        Long id = (Long) request.getSession().getAttribute("dishDto");
-////        log.info();
-//        dishDto.setUpdateUser(id);
-        log.info("dishId:{}",dishDto);
-        dishService.savaWithFlavor(dishDto);
+    public R<String> save(@RequestBody DishDto dishDto){//提交的json数据需要requestBody注解
 
+        log.info(dishDto.toString());
+        dishService.saveWithFlavor(dishDto);
 
         return R.success("新增菜品成功");
     }
@@ -93,5 +87,27 @@ public class DishController {
 
 
         return R.success((DishDto)dish);
+    }
+
+    /**
+     * 获取菜品分类列表
+     * @param dish
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Dish>> list(Dish dish){
+        log.info("dish,categoryId{}",dish);
+
+        //构造查询条件对象
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(dish.getCategoryId()!=null,Dish::getCategoryId,dish.getCategoryId());
+        //添加查询条件，查询状态在售的菜品
+        lambdaQueryWrapper.eq(Dish::getStatus,1);
+
+        //添加排序条件
+        lambdaQueryWrapper.orderByDesc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
+        List<Dish> list = dishService.list(lambdaQueryWrapper);
+        return R.success(list);
     }
 }

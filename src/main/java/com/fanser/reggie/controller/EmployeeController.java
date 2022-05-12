@@ -54,6 +54,7 @@ public class EmployeeController {
         }
         //6.登陆成功，将员工id存入Session对象，并返回登陆成功结果
         request.getSession().setAttribute("employee",emp.getId());
+        log.info("session:{}",request.getSession().getAttribute("employee"));
         return R.success(emp);
     }
 
@@ -107,7 +108,7 @@ public class EmployeeController {
     @GetMapping("/page")
     public R<Page> page( int currentPage, int pageSize,String name){
 
-        log.info("currentPage:{},pageSize:{},String name:{}",currentPage,pageSize,name);
+        log.info("currentPage:{},pageSize:{},name:{}",currentPage,pageSize,name);
         //1.构造分页构造器
         Page pageInfo = new Page(currentPage,pageSize);
         //2.构建条件构造器
@@ -130,7 +131,10 @@ public class EmployeeController {
      */
     @PutMapping
     public R<String> update(HttpServletRequest request,@RequestBody Employee employee){
+        log.info(employee.toString());
 
+        long id = Thread.currentThread().getId();
+        log.info("线程id为：{}",id);
 //        Long empId = (Long) request.getSession().getAttribute("employee");
 //
 //        employee.setUpdateTime(LocalDateTime.now());
@@ -142,10 +146,10 @@ public class EmployeeController {
     @GetMapping("{id}")
     public R<Employee> getById(@PathVariable Long id){
         log.info("根据id查询员工信息");
-        if (id!=null) {
-            Employee employee = employeeService.getById(id);
+        Employee employee = employeeService.getById(id);
+        if (employee!=null) {
             return R.success(employee);
         }
-        return null;
+        return R.error("没有查询到员工信息");
     }
 }
