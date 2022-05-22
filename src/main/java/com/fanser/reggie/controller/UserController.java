@@ -10,6 +10,7 @@ import com.fanser.reggie.util.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
@@ -25,6 +27,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @PostMapping("/sendMsg")
     public R<String> sendMsg(@RequestBody User user, HttpSession session) {
@@ -41,6 +46,11 @@ public class UserController {
 
 //            需要将生成的验证码保存到session
             session.setAttribute(phone, code);
+
+            //将生成的验证码存入到redis缓存中，设置有效期为五分钟
+            redisTemplate.opsForValue().set(phone,code,5, TimeUnit.MINUTES);
+
+
             return R.success("短信验证码已发送成功");
         }
         return R.error("短信发送失败");
@@ -58,10 +68,15 @@ public class UserController {
     public R<User> login(@RequestBody Map map, HttpSession session) {
         log.info(map.toString());
 //        log.info(session.getAttribute("phone").toString());
+        //获取传入的手机号和验证码
         String phone = map.get("phone").toString();
         String code = map.get("code").toString();
 
-        String codeInSession = session.getAttribute(phone).toString();
+        //从session中获取验证码，方便比对
+//        String codeInSession = session.getAttribute(phone).toString();
+
+        //从redis中获取缓存的验证码
+        Object codeInSession = redisTemplate.opsForValue().get(phone);
 
         if (code != null && codeInSession.equals(code)) {
             //如果传入的phone不为空，且与后台session一致，则进行手机号查找
@@ -75,6 +90,10 @@ public class UserController {
                 userService.save(user);
             }
             session.setAttribute("user",user.getId());
+
+            //如果用户登陆成功,删除redis中的缓存验证码
+            redisTemplate.delete(phone);
+
             return R.success(user);
         }
         return R.error("登陆失败");
