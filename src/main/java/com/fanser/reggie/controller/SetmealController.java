@@ -1,12 +1,15 @@
 package com.fanser.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fanser.reggie.common.R;
 import com.fanser.reggie.dto.SetmealDto;
 import com.fanser.reggie.entity.Category;
+import com.fanser.reggie.entity.Dish;
 import com.fanser.reggie.entity.Setmeal;
 import com.fanser.reggie.service.CategoryService;
+import com.fanser.reggie.service.DishService;
 import com.fanser.reggie.service.SetmealDishService;
 import com.fanser.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +35,9 @@ public class SetmealController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private DishService dishService;
 
     /**
      * 新增套餐
@@ -102,5 +108,60 @@ public class SetmealController {
         dtoPage.setRecords(list);
 
         return R.success(dtoPage);
+    }
+
+    /**
+     * 根据传入的id删除套餐
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+        log.info(ids.toString());
+
+        setmealService.removeWithDish(ids);
+        return R.success("删除套餐成功");
+    }
+
+    /**
+     * 根据套餐id修改菜品状态，当菜品状态都为不在售的情况下，修改套餐在售状态
+     * @param status
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public R<String> status(@PathVariable Integer status,@RequestParam List<Long> ids){
+        log.info("status:{},ids:{}",status,ids);
+
+        setmealService.updateStatusById(status,ids);
+        return R.success("修改成功");
+    }
+    @GetMapping("/{ids}")
+    public R<SetmealDto> getDate(@PathVariable Long ids){
+        log.info("id:{}",ids);
+        SetmealDto setmealDto = setmealService.getDate(ids);
+        return R.success(setmealDto);
+    }
+    @PutMapping
+    public R<String> edit(@RequestBody SetmealDto setmealDto){
+        log.info("套餐信息：{}", setmealDto);
+        setmealService.updateById(setmealDto);
+        return R.success("修改套餐成功");
+    }
+
+    /**
+     * 根据条件查询套餐数据
+     * @param setmeal
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Setmeal>> list(Setmeal setmeal){
+        //SQL:select * from setmeal where categoryId = ? and status = ? order by updateTime desc
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(setmeal.getCategoryId()!=null,Setmeal::getCategoryId,setmeal.getCategoryId());
+        queryWrapper.eq(setmeal.getStatus()!=null,Setmeal::getStatus,setmeal.getStatus());
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
+        List<Setmeal> list = setmealService.list(queryWrapper);
+        return R.success(list);
     }
 }
