@@ -19,6 +19,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,10 @@ public class DishController {
 
         log.info(dishDto.toString());
         dishService.saveWithFlavor(dishDto);
+
+        //改进一下，准确的清理指定的套餐,注意：前端返回的菜品只有状态为在售的才会显示，所以这里直接使用 “_1”
+        String key = "dish_" + dishDto.getCategoryId() +"_1";
+        redisTemplate.delete(key);
 
         return R.success("新增菜品成功");
     }
@@ -82,16 +87,26 @@ public class DishController {
 
         return R.success(dtoPage);
     }
+
     @GetMapping("/{id}")
     public R<DishDto> get(@PathVariable Long id ){
         DishDto dishDto = dishService.getByIdWithFlavor(id);
         log.info("dishDto:{}",dishDto);
         return R.success(dishDto);
     }
+
     @PutMapping
     public R<DishDto> update(DishDto dishDto){
         Dish dish = dishService.getById(dishDto.getId());
         dishService.updateWithFlavor(dishDto);
+
+        //清理所有的菜品缓存,将dish_ 开头的key全部清理掉
+//        Set keys = redisTemplate.keys("dish_*");
+//        redisTemplate.delete(keys);
+
+        //改进一下，准确的清理指定的套餐,注意：前端返回的菜品只有状态为在售的才会显示，所以这里直接使用 “_1”
+        String key = "dish_" + dishDto.getCategoryId() +"_1";
+        redisTemplate.delete(key);
 
 
         return R.success((DishDto)dish);
