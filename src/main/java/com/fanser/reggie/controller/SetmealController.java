@@ -44,8 +44,32 @@ public class SetmealController {
         log.info("套餐信息：{}", setmealDto);
 
         setmealService.saveWithDish(setmealDto);
-//        return setmealDishService.save(setmealDto);
         return R.success("创建套餐成功");
+    }
+
+    /**
+     * 删除套餐
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+        log.info("ids==>{}" + ids);
+        setmealService.removeWithDish(ids);
+        return R.success("套餐删除成功");
+    }
+
+    /**
+     * 修改套餐
+     * @param setmealDto
+     * @return
+     */
+    @PutMapping
+    public R<String> update(@RequestBody SetmealDto setmealDto){
+        log.info("修改套餐信息{}", setmealDto);
+        // 执行更新。
+        setmealService.updateWithSetmeal(setmealDto);
+        return R.success("套餐修改成功");
     }
 
     /**
@@ -64,7 +88,6 @@ public class SetmealController {
 
         //基本上所有的mp的方法都需要加上对应的实体类对象
         LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper();
-
         //添加查询条件，根据name进行like模糊查询，查询指定套餐
         lambdaQueryWrapper.like(name != null, Setmeal::getName, name);
         //添加排序条件
