@@ -7,25 +7,19 @@ import com.fanser.reggie.dto.SetmealDto;
 import com.fanser.reggie.entity.Category;
 import com.fanser.reggie.entity.Setmeal;
 import com.fanser.reggie.service.CategoryService;
-import com.fanser.reggie.service.SetmealDishService;
 import com.fanser.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/setmeal")
 @Slf4j
 public class SetmealController {
-
-    @Autowired
-    private SetmealDishService setmealDishService;
 
     @Autowired
     private SetmealService setmealService;
@@ -70,6 +64,36 @@ public class SetmealController {
         // 执行更新。
         setmealService.updateWithSetmeal(setmealDto);
         return R.success("套餐修改成功");
+    }
+
+    /**
+     * 根据条件查询套餐数据
+     * @param setmeal
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Setmeal>> list(Setmeal setmeal){
+        // 构造查询条件
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(setmeal.getCategoryId()!=null,Setmeal::getCategoryId,setmeal.getCategoryId());
+        queryWrapper.eq(setmeal.getStatus()!=null,Setmeal::getStatus,setmeal.getStatus());
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
+        List<Setmeal> list = setmealService.list(queryWrapper);
+        return R.success(list);
+    }
+
+    /**
+     * 根据id查询套餐信息
+     *(套餐信息的回显)
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<SetmealDto> getById(@PathVariable Long id) {
+        log.info("根据id查询套餐信息:{}", id);
+        // 调用service执行查询
+        SetmealDto setmealDto = setmealService.getByIdWithDish(id);
+        return R.success(setmealDto);
     }
 
     /**
@@ -125,5 +149,23 @@ public class SetmealController {
         dtoPage.setRecords(list);
 
         return R.success(dtoPage);
+    }
+
+    /**
+     * 更新套餐是否在售状态
+     * @param status
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public R<String> setmealStatusChange(@PathVariable Integer status,Long[] ids ){
+        for (int i = 0; i < ids.length; i++) {
+            // 获取菜品
+            Setmeal setmeal = setmealService.getById(ids[i]);
+            setmeal.setStatus(status);
+            // 修改状态
+            setmealService.updateById(setmeal);
+        }
+        return R.success("修改成功");
     }
 }

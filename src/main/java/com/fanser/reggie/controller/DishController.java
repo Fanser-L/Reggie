@@ -84,8 +84,6 @@ public class DishController {
     public R<DishDto> update(DishDto dishDto){
         Dish dish = dishService.getById(dishDto.getId());
         dishService.updateWithFlavor(dishDto);
-
-
         return R.success((DishDto)dish);
     }
 
@@ -109,5 +107,10 @@ public class DishController {
 
         List<Dish> list = dishService.list(lambdaQueryWrapper);
         return R.success(list);
+    }
+    @DeleteMapping
+    public R del(@RequestParam List<Long> ids){
+        dishService.removeByIds(ids);
+        return R.success("删除菜品成功");
     }
 }

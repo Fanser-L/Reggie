@@ -39,7 +39,7 @@ public class CommonController {
         //获取文件后缀
         String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
         //2.使用UUID重新生成文件名，防止文件名重复造成文件覆盖
-        String fileName = UUID.randomUUID().toString()+suffix;
+        String fileName = UUID.randomUUID()+suffix;
 
         //当目录不存在时，创建对应的文件夹
         File dir = new File(basePath);

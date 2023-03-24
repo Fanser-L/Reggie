@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * 员工实体
@@ -43,4 +44,16 @@ public class Employee implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE) //插入和更新时填充字段
     private Long updateUser;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Employee employee = (Employee) o;
+        return id.equals(employee.id) && Objects.equals(username, employee.username) && Objects.equals(name, employee.name) && Objects.equals(password, employee.password) && Objects.equals(phone, employee.phone) && Objects.equals(sex, employee.sex) && Objects.equals(idNumber, employee.idNumber) && Objects.equals(status, employee.status) && Objects.equals(createTime, employee.createTime) && Objects.equals(updateTime, employee.updateTime) && Objects.equals(createUser, employee.createUser) && Objects.equals(updateUser, employee.updateUser);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, name, password, phone, sex, idNumber, status, createTime, updateTime, createUser, updateUser);
+    }
 }
